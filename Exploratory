@@ -24,3 +24,27 @@ AND k1.record_id = "8828562084520"
 GROUP BY k1.analysis_date
 ORDER BY k1.analysis_date
 LIMIT 10
+
+
+////
+
+
+SELECT DISTINCT sp14.record_id, sp14.report_date, sp14.record_type, sp14.campaign_name, k3.change_date, sp14.impressions, k3.from_bid, k3.to_bid
+FROM sponsored_products_14d_metrics AS sp14
+LEFT JOIN amz_keyword_histories AS k3 on sp14.record_id = k3.record_id
+	AND DATE(sp14.report_date) = DATE(k3.change_date)
+WHERE sp14.record_id = "8828562084520"
+	AND k3.analysis_type = "fourteen-day" 
+	AND k3.record_id IS NOT NULL
+	AND sp14.report_date BETWEEN "2022-06-05" AND "2022-08-15"
+UNION
+SELECT DISTINCT sp14.record_id, sp14.report_date, sp14.record_type, sp14.campaign_name, k3.change_date, sp14.impressions, k3.from_bid, k3.to_bid
+FROM sponsored_products_14d_metrics AS sp14
+LEFT JOIN amz_keyword_histories AS k3 on sp14.record_id = k3.record_id
+	AND DATE(sp14.report_date) = DATE(k3.change_date)
+WHERE sp14.record_id = "8828562084520"
+	AND sp14.impressions > 0
+	AND k3.record_id IS NULL
+order by report_date
+LIMIT 100;
+
