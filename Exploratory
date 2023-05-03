@@ -1,16 +1,16 @@
 # amz_api
 
-SELECT 	k1.record_id, k1.impressions, k1.clicks, DATE(k1.analysis_date) as analysisdate, k1.sales14d, k1.cost, k1.bid, k1.analysis_type, DATE(k2.change_date) as changedate, k2.from_bid, k2.to_bid,
+SELECT 	k1.record_id, k1.impressions, k1.clicks, DATE(k1.analysis_date) as analysisdate, k1.sales14d, k1.cost, k1.bid, k1.analysis_type, DATE(k3.change_date) as changedate, k3.from_bid, k3.to_bid,
     COALESCE(sbs.match_type, sps.match_type) as match_type,
     COALESCE(sbs.match_type_text, sps.match_type_text) as match_type_text,
     COALESCE(sbc.campaign_name, spc.campaign_name) as campaign_name
 FROM amz_analyzed_keywords AS k1
-INNER JOIN
+LEFT JOIN
 	amz_keyword_histories AS k2 ON k1.record_id = k2.record_id
 LEFT JOIN
-	amz_analyzed_keywords  on k1.record_id = k2.record_id
-	AND DATE(k1.analysis_date) = DATE(k2.change_date)
-	AND k1.analysis_type = k2.analysis_type
+	amz_keyword_histories AS k3 on k1.record_id = k3.record_id
+	AND DATE(k1.analysis_date) = DATE(k3.change_date)
+	AND k1.analysis_type = k3.analysis_type
 LEFT JOIN
 	sponsored_brands_snapshots as sbs ON k1.record_id = sbs.record_id
 LEFT JOIN
@@ -19,6 +19,8 @@ LEFT JOIN
 	sponsored_brands_campaign_state as sbc ON sbs.campaign_id = sbc.campaign_id
 LEFT JOIN
 	sponsored_product_campaign_state as spc ON sps.campaign_id = spc.campaign_id
-WHERE k2.from_bid != k2.to_bid
+WHERE k3.from_bid != k3.to_bid
 AND k1.record_id = "8828562084520"
+GROUP BY k1.analysis_date
+ORDER BY k1.analysis_date
 LIMIT 10
